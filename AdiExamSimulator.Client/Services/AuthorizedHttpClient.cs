@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using System.Net.Http.Headers;
 
 namespace AdiExamSimulator.Client.Services
 {
@@ -22,7 +23,7 @@ namespace AdiExamSimulator.Client.Services
             if (!string.IsNullOrWhiteSpace(token))
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new AuthenticationHeaderValue("Bearer", token);
             }
 
             return _httpClient;

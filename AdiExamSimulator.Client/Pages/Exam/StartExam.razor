@@ -1,0 +1,67 @@
+@using AdiExamSimulator.Client.Services
+@page "/start-exam"
+@inject AuthorizedHttpClient AuthorizedClient
+@inject NavigationManager Navigation
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@using AdiExamSimulator.Client.Models
+
+<h3>Start New Exam</h3>
+
+@if (IsLoading)
+{
+    <p>Loading exam...</p>
+}
+else if (HasError)
+{
+    <p>Error loading exam. Please try again later.</p>
+}
+else if (Questions != null)
+{
+    <p>Exam Loaded: @Questions.Count questions</p>
+    <button class="btn btn-primary" @onclick="BeginExam">Begin Exam</button>
+}
+else
+{
+    <button class="btn btn-primary" @onclick="LoadExam">Load Exam</button>
+}
+
+@code {
+    private List<Question>? Questions;
+    private bool IsLoading = false;
+    private bool HasError = false;
+
+    private async Task LoadExam()
+    {
+        IsLoading = true;
+        HasError = false;
+
+        try
+        {
+            var client = await AuthorizedClient.GetClientAsync();
+            var response = await client.GetAsync("questions/random");
+
+            if (response.IsSuccessStatusCode)
+            {
+                Questions = await response.Content.ReadFromJsonAsync<List<Question>>();
+
+                // Save questions into local storage to pass to TakeExam page
+                await LocalStorage.SetItemAsync("currentExam", Questions);
+            }
+            else
+            {
+                HasError = true;
+            }
+        }
+        catch
+        {
+            HasError = true;
+        }
+
+        IsLoading = false;
+    }
+
+    private void BeginExam()
+    {
+        Navigation.NavigateTo("/take-exam");
+    }
+}

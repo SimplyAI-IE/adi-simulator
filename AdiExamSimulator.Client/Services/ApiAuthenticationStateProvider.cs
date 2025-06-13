@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
+using Blazored.LocalStorage;
 
 namespace AdiExamSimulator.Client.Services
 {
@@ -44,7 +45,8 @@ namespace AdiExamSimulator.Client.Services
             var payload = jwt.Split('.')[1];
             var jsonBytes = ParseBase64WithoutPadding(payload);
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
-            return keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString() ?? ""));
+            return (keyValuePairs ?? Enumerable.Empty<KeyValuePair<string, object>>())
+    .Select(kvp => new Claim(kvp.Key, kvp.Value?.ToString() ?? ""));
         }
 
         private byte[] ParseBase64WithoutPadding(string base64)

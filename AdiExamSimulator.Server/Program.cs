@@ -11,14 +11,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure DbContext with SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add Authentication
-var jwtKey = builder.Configuration["Jwt:Key"];
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
-var jwtAudience = builder.Configuration["Jwt:Audience"];
+// Read JWT config with null checks
+var jwtKey = builder.Configuration["Jwt:Key"] 
+    ?? throw new ArgumentNullException("Jwt:Key is not configured");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] 
+    ?? throw new ArgumentNullException("Jwt:Issuer is not configured");
+var jwtAudience = builder.Configuration["Jwt:Audience"] 
+    ?? throw new ArgumentNullException("Jwt:Audience is not configured");
 
+// Add Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -48,7 +53,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Important: add authentication & authorization middleware
+// Important: authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

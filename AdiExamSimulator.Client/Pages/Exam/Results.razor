@@ -1,0 +1,88 @@
+@using AdiExamSimulator.Client.Services
+@page "/results"
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject AuthorizedHttpClient AuthorizedClient
+@using AdiExamSimulator.Client.Models
+
+<h3>Exam Results</h3>
+
+@if (Questions == null || Answers == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>Score: @Score.ToString("F2")%</p>
+    <p>Correct: @CorrectCount / @Questions.Count</p>
+
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+                <th>Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Questions.Count; i++)
+            {
+                <tr class="@(Answers[i] == Questions[i].CorrectOption ? "" : "table-danger")">
+                    <td>@Questions[i].QuestionText</td>
+                    <td>@Answers[i]</td>
+                    <td>@Questions[i].CorrectOption</td>
+                    <td>@Questions[i].Explanation</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Question>? Questions;
+    private List<string?>? Answers;
+    private int CorrectCount = 0;
+    private double Score = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var examData = await LocalStorage.GetItemAsync<TakeExam.ExamData>("examResult");
+
+        if (examData == null || examData.Questions == null)
+        {
+            return;
+        }
+
+        Questions = examData.Questions;
+        Answers = examData.Answers;
+
+        // Calculate score
+        for (int i = 0; i < Questions.Count; i++)
+        {
+            if (Answers[i] == Questions[i].CorrectOption)
+                CorrectCount++;
+        }
+
+        Score = ((double)CorrectCount / Questions.Count) * 100;
+
+        await SubmitResult();
+    }
+
+    private async Task SubmitResult()
+    {
+        var submission = new ResultSubmission
+        {
+            TotalQuestions = Questions!.Count,
+            CorrectCount = CorrectCount,
+            Score = Score,
+            BreakdownJSON = System.Text.Json.JsonSerializer.Serialize(new { Questions, Answers })
+        };
+
+        var client = await AuthorizedClient.GetClientAsync();
+        await client.PostAsJsonAsync("results/submit", submission);
+
+        // Clear exam data after submission
+        await LocalStorage.RemoveItemAsync("examResult");
+        await LocalStorage.RemoveItemAsync("currentExam");
+    }
+}

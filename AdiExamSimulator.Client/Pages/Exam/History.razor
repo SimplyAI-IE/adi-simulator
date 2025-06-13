@@ -1,0 +1,71 @@
+@using AdiExamSimulator.Client.Services
+@page "/history"
+@inject AuthorizedHttpClient AuthorizedClient
+@using System.Text.Json
+@using AdiExamSimulator.Client.Models
+
+<h3>Exam History</h3>
+
+@if (IsLoading)
+{
+    <p>Loading...</p>
+}
+else if (Results == null || Results.Count == 0)
+{
+    <p>No previous exams found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Score</th>
+                <th>Correct</th>
+                <th>Questions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Results)
+            {
+                <tr>
+                    <td>@r.ExamDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@r.Score.ToString("F2")%</td>
+                    <td>@r.CorrectCount</td>
+                    <td>@r.TotalQuestions</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ResultModel>? Results;
+    private bool IsLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var client = await AuthorizedClient.GetClientAsync();
+            Results = await client.GetFromJsonAsync<List<ResultModel>>("results/history");
+        }
+        catch
+        {
+            Results = new();
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    public class ResultModel
+    {
+        public int ResultId { get; set; }
+        public DateTime ExamDate { get; set; }
+        public int TotalQuestions { get; set; }
+        public int CorrectCount { get; set; }
+        public double Score { get; set; }
+    }
+}

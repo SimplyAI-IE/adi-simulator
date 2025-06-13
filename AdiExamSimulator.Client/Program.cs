@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazored.LocalStorage;
 using AdiExamSimulator.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using AdiExamSimulator.Client;
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.Services.AddScoped<AuthorizedHttpClient>();
-
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:5001/") });
 
