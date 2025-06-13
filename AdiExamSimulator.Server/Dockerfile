@@ -3,11 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore only server project
-COPY ["AdiExamSimulator.Server/AdiExamSimulator.Server.csproj", "./"]
+COPY ["AdiExamSimulator.Server.csproj", "./"]
 RUN dotnet restore "AdiExamSimulator.Server.csproj"
 
 # Copy all source files from server folder
-COPY AdiExamSimulator.Server/. ./
+COPY . ./
 
 # Publish the server app
 RUN dotnet publish -c Release -o /app/publish
