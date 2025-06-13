@@ -160,6 +160,49 @@ adi-simulator/
 yaml
 Copy
 
+🚀 Deployment on Render.com
+Backend (Web Service)
+The backend ASP.NET Core Web API is deployed as a Render Web Service.
+
+Docker is used for build and deployment.
+
+Docker build context is set to AdiExamSimulator.Server/.
+
+Dockerfile path is AdiExamSimulator.Server/Dockerfile.
+
+Instance type: Hobby (free) or paid depending on your needs.
+
+Environment variables (e.g., connection strings, JWT secrets) should be configured securely on Render.
+
+Health check path set to /healthz for monitoring.
+
+Frontend (Blazor WebAssembly)
+The Blazor WASM client can be deployed as a Render Static Site.
+
+Build the client locally with dotnet publish -c Release -o publish.
+
+Upload the published wwwroot folder contents to Render’s static site.
+
+Alternatively, automate deployment with Render Git integration and appropriate build commands (dotnet publish).
+
+Configure the client to use the live backend API base URL (https://adi-simulator.onrender.com).
+
+Useful Render Tips
+Enable Auto-Deploy on commits to your GitHub repo for continuous deployment.
+
+Use Render’s Secret Files or Environment Variables to store sensitive data securely.
+
+Monitor logs and deploy health on the Render dashboard.
+
+For SSL and HTTPS, Render provides built-in support.
+
+Example Environment Variables to Set on Render
+Name	Description
+DefaultConnection	Connection string for SQLite/Postgres DB
+Jwt__Key	Secret key for JWT token signing
+Jwt__Issuer	JWT issuer identifier
+Jwt__Audience	JWT audience
+
 ---
 
 ## 🛠 Development & Build Instructions
