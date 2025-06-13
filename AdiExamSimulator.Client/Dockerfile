@@ -3,11 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY AdiExamSimulator.Client/*.csproj ./
+COPY *.csproj ./
 RUN dotnet restore
 
 # Copy all client source files
-COPY AdiExamSimulator.Client/. ./
+COPY . ./
 
 # Publish the client app
 RUN dotnet publish -c Release -o /app/publish
