@@ -3,11 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY AdiExamSimulator.Client/*.csproj ./ 
+COPY *.csproj ./
 RUN dotnet restore
 
 # Copy all files and build release
-COPY AdiExamSimulator.Client/. ./
+COPY . ./
 RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Serve the published files with Nginx
