@@ -1,0 +1,6 @@
+@AdiExamSimulator.Server_HostAddress = http://localhost:5177
+
+GET {{AdiExamSimulator.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

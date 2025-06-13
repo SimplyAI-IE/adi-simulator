@@ -1,0 +1,11 @@
+bin/
+obj/
+*.db
+*.user
+*.suo
+.vscode/
+.idea/
+.env
+node_modules/
+.DS_Store
+*.sqlite

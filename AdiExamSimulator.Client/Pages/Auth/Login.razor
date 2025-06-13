@@ -1,0 +1,41 @@
+@page "/login"
+@inject HttpClient Http
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+
+<h3>Login</h3>
+
+<input @bind="Email" placeholder="Email" />
+<input @bind="Password" type="password" placeholder="Password" />
+<button @onclick="LoginUser">Login</button>
+
+<p>@Message</p>
+
+@code {
+    private string Email = "";
+    private string Password = "";
+    private string Message = "";
+
+    private async Task LoginUser()
+    {
+        var response = await Http.PostAsJsonAsync("auth/login", new { Email, Password });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
+            await LocalStorage.SetItemAsync("authToken", result.Token);
+            ((ApiAuthenticationStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Message = "Login failed.";
+        }
+    }
+
+    private class AuthResponse
+    {
+        public string Token { get; set; } = "";
+    }
+}
